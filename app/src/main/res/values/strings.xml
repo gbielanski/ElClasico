@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name"> Score Keeper EL CLASICO</string>
+    <string name="team_a">Real Madrid</string>
+    <string name="team_b">FC Barcelona</string>
+</resources>
