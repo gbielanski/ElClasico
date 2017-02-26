@@ -52,11 +52,15 @@ public class MainActivity extends AppCompatActivity {
      * Displays the given scoreTeamB for Team B.
      */
     public void displayGoalHistory(String teamName) {
-        goalHistoryTextView.setBackgroundColor(0xffffff);
         CharSequence currentHistory = goalHistoryTextView.getText();
-        goalHistoryTextView.setText(currentHistory.toString() + "\n" + teamName
-                + " " + String.valueOf(scoreTeamA)
-                + " : "  + String.valueOf(scoreTeamB));
+        if (currentHistory.toString().isEmpty())
+            goalHistoryTextView.setText(currentHistory.toString() + teamName
+                    + " " + String.valueOf(scoreTeamA)
+                    + " : " + String.valueOf(scoreTeamB));
+        else
+            goalHistoryTextView.setText(currentHistory.toString() + "\n" + teamName
+                    + " " + String.valueOf(scoreTeamA)
+                    + " : " + String.valueOf(scoreTeamB));
     }
 
     public void resetGoalHistory() {
