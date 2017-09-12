@@ -1,21 +1,22 @@
 package com.example.android.courtcounter;
 
+import android.arch.lifecycle.LifecycleActivity;
+import android.arch.lifecycle.ViewModelProvider;
+import android.arch.lifecycle.ViewModelProviders;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends LifecycleActivity {
 
-    int scoreTeamA = 0;
-    int scoreTeamB = 0;
-    private int foulsTeamA = 0;
-    private int foulsTeamB = 0;
     private TextView teamAScoreTextView;
     private TextView teamBScoreTextView;
     private TextView goalHistoryTextView;
     private TextView teamAFouls;
     private TextView teamBFouls;
+
+    private ScoreViewModel mViewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,6 +27,14 @@ public class MainActivity extends AppCompatActivity {
         goalHistoryTextView = (TextView) findViewById(R.id.goal_history);
         teamAFouls = (TextView) findViewById(R.id.team_a_foul);
         teamBFouls = (TextView) findViewById(R.id.team_b_foul);
+
+        mViewModel = ViewModelProviders.of(this).get(ScoreViewModel.class);
+
+        displayFoulsForTeamA(mViewModel.getFoulsTeamA());
+        displayFoulsForTeamB(mViewModel.getFoulsTeamB());
+        displayForTeamA(mViewModel.getScoreTeamA());
+        displayForTeamB(mViewModel.getScoreTeamB());
+
     }
 
     /**
@@ -36,8 +45,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void goalTeamA(View v){
-        scoreTeamA = scoreTeamA + 1;
-        displayForTeamA(scoreTeamA);
+        mViewModel.increaseScoreTeamA();
+        displayForTeamA(mViewModel.getScoreTeamA());
         displayGoalHistory(getResources().getString(R.string.team_a));
     }
 
@@ -55,12 +64,12 @@ public class MainActivity extends AppCompatActivity {
         CharSequence currentHistory = goalHistoryTextView.getText();
         if (currentHistory.toString().isEmpty())
             goalHistoryTextView.setText(currentHistory.toString() + teamName
-                    + " " + String.valueOf(scoreTeamA)
-                    + " : " + String.valueOf(scoreTeamB));
+                    + " " + String.valueOf(mViewModel.getScoreTeamA())
+                    + " : " + String.valueOf(mViewModel.getScoreTeamB()));
         else
             goalHistoryTextView.setText(currentHistory.toString() + "\n" + teamName
-                    + " " + String.valueOf(scoreTeamA)
-                    + " : " + String.valueOf(scoreTeamB));
+                    + " " + String.valueOf(mViewModel.getScoreTeamA())
+                    + " : " + String.valueOf(mViewModel.getScoreTeamB()));
     }
 
     public void resetGoalHistory() {
@@ -68,18 +77,18 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void goalTeamB(View v){
-        scoreTeamB = scoreTeamB + 1;
-        displayForTeamB(scoreTeamB);
+        mViewModel.increaseScoreTeamB();
+        displayForTeamB(mViewModel.getScoreTeamB());
         displayGoalHistory(getResources().getString(R.string.team_b));
     }
 
     public void foulsTeamA(View v){
-        foulsTeamA = foulsTeamA + 1;
-        displayFoulsForTeamA(foulsTeamA);
+        mViewModel.increaseFoulsTeamA();
+        displayFoulsForTeamA(mViewModel.getFoulsTeamA());
     }
     public void foulsTeamB(View v){
-        foulsTeamB = foulsTeamB + 1;
-        displayFoulsForTeamB(foulsTeamB);
+        mViewModel.increaseFoulsTeamB();
+        displayFoulsForTeamB(mViewModel.getFoulsTeamB());
     }
     public void displayFoulsForTeamA(int foulsTeamA) {
         teamAFouls.setText(String.valueOf(foulsTeamA));
@@ -89,15 +98,12 @@ public class MainActivity extends AppCompatActivity {
         teamBFouls.setText(String.valueOf(foulsTeamB));
     }
 
-    public void resetScore(View v){
-        scoreTeamA = 0;
-        scoreTeamB = 0;
-        foulsTeamA = 0;
-        foulsTeamB = 0;
-        displayFoulsForTeamA(foulsTeamA);
-        displayFoulsForTeamB(foulsTeamB);
-        displayForTeamA(scoreTeamA);
-        displayForTeamB(scoreTeamB);
+    public void resetScore(View v) {
+        mViewModel.resetAll();
+        displayFoulsForTeamA(mViewModel.getFoulsTeamA());
+        displayFoulsForTeamB(mViewModel.getFoulsTeamB());
+        displayForTeamA(mViewModel.getScoreTeamA());
+        displayForTeamB(mViewModel.getScoreTeamB());
         resetGoalHistory();
     }
 
