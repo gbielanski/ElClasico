@@ -8,15 +8,23 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
 
+import java.util.List;
+
 import butterknife.BindView;
+import butterknife.ButterKnife;
 
 public class MainActivity extends LifecycleActivity {
 
-    @BindView(R.id.team_a_score) TextView teamAScoreTextView;
-    @BindView(R.id.team_b_score) TextView teamBScoreTextView;
-    @BindView(R.id.goal_history) TextView goalHistoryTextView;
-    @BindView(R.id.team_a_foul) TextView teamAFouls;
-    @BindView(R.id.team_b_foul) TextView teamBFouls;
+    @BindView(R.id.team_a_score)
+    TextView teamAScoreTextView;
+    @BindView(R.id.team_b_score)
+    TextView teamBScoreTextView;
+    @BindView(R.id.goal_history)
+    TextView goalHistoryTextView;
+    @BindView(R.id.team_a_foul)
+    TextView teamAFouls;
+    @BindView(R.id.team_b_foul)
+    TextView teamBFouls;
 
     private ScoreViewModel mViewModel;
 
@@ -24,65 +32,64 @@ public class MainActivity extends LifecycleActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
+        ButterKnife.bind(this);
         mViewModel = ViewModelProviders.of(this).get(ScoreViewModel.class);
         displayAll();
 
     }
 
-    /**
-     * Displays the given scoreTeamA for Team A.
-     */
     public void displayForTeamA(int score) {
         teamAScoreTextView.setText(String.valueOf(score));
     }
 
-    public void goalTeamA(View v){
+    public void goalTeamA(View v) {
         mViewModel.increaseScoreTeamA();
         displayForTeamA(mViewModel.getScoreTeamA());
-        displayGoalHistory(getResources().getString(R.string.team_a));
+        String goalHistoryItem = getResources().getString(R.string.team_b) + " " + String.valueOf(mViewModel.getScoreTeamA()) + " : " + String.valueOf(mViewModel.getScoreTeamB());
+        mViewModel.addGoalHistory(goalHistoryItem);
+        displayGoalHistory();
     }
 
-    /**
-     * Displays the given scoreTeamB for Team B.
-     */
     public void displayForTeamB(int score) {
         teamBScoreTextView.setText(String.valueOf(score));
     }
 
-    /**
-     * Displays the given scoreTeamB for Team B.
-     */
-    public void displayGoalHistory(String teamName) {
-        CharSequence currentHistory = goalHistoryTextView.getText();
-        if (currentHistory.toString().isEmpty())
-            goalHistoryTextView.setText(currentHistory.toString() + teamName
-                    + " " + String.valueOf(mViewModel.getScoreTeamA())
-                    + " : " + String.valueOf(mViewModel.getScoreTeamB()));
-        else
-            goalHistoryTextView.setText(currentHistory.toString() + "\n" + teamName
-                    + " " + String.valueOf(mViewModel.getScoreTeamA())
-                    + " : " + String.valueOf(mViewModel.getScoreTeamB()));
+    public void displayGoalHistory() {
+        List<String> goalHistory = mViewModel.getGoalHistory();
+
+        if (goalHistory.size() > 0) {
+            goalHistoryTextView.setVisibility(View.VISIBLE);
+            StringBuffer formattedGoalHistory = new StringBuffer();
+            for (String goalHistoryItem : goalHistory) {
+                formattedGoalHistory.append(goalHistoryItem + "\n");
+            }
+            goalHistoryTextView.setText(formattedGoalHistory.toString());
+        } else
+            goalHistoryTextView.setVisibility(View.GONE);
     }
 
     public void resetGoalHistory() {
         goalHistoryTextView.setText("");
     }
 
-    public void goalTeamB(View v){
+    public void goalTeamB(View v) {
         mViewModel.increaseScoreTeamB();
         displayForTeamB(mViewModel.getScoreTeamB());
-        displayGoalHistory(getResources().getString(R.string.team_b));
+        String goalHistoryItem = getResources().getString(R.string.team_b) + " " + String.valueOf(mViewModel.getScoreTeamA()) + " : " + String.valueOf(mViewModel.getScoreTeamB());
+        mViewModel.addGoalHistory(goalHistoryItem);
+        displayGoalHistory();
     }
 
-    public void foulsTeamA(View v){
+    public void foulsTeamA(View v) {
         mViewModel.increaseFoulsTeamA();
         displayFoulsForTeamA(mViewModel.getFoulsTeamA());
     }
-    public void foulsTeamB(View v){
+
+    public void foulsTeamB(View v) {
         mViewModel.increaseFoulsTeamB();
         displayFoulsForTeamB(mViewModel.getFoulsTeamB());
     }
+
     public void displayFoulsForTeamA(int foulsTeamA) {
         teamAFouls.setText(String.valueOf(foulsTeamA));
     }
@@ -98,10 +105,11 @@ public class MainActivity extends LifecycleActivity {
     }
 
     private void displayAll() {
-        displayFoulsForTeamA(mViewModel.getFoulsTeamA());
-        displayFoulsForTeamB(mViewModel.getFoulsTeamB());
         displayForTeamA(mViewModel.getScoreTeamA());
         displayForTeamB(mViewModel.getScoreTeamB());
+        displayFoulsForTeamA(mViewModel.getFoulsTeamA());
+        displayFoulsForTeamB(mViewModel.getFoulsTeamB());
+        displayGoalHistory();
     }
 
 }
