@@ -8,13 +8,15 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
 
+import butterknife.BindView;
+
 public class MainActivity extends LifecycleActivity {
 
-    private TextView teamAScoreTextView;
-    private TextView teamBScoreTextView;
-    private TextView goalHistoryTextView;
-    private TextView teamAFouls;
-    private TextView teamBFouls;
+    @BindView(R.id.team_a_score) TextView teamAScoreTextView;
+    @BindView(R.id.team_b_score) TextView teamBScoreTextView;
+    @BindView(R.id.goal_history) TextView goalHistoryTextView;
+    @BindView(R.id.team_a_foul) TextView teamAFouls;
+    @BindView(R.id.team_b_foul) TextView teamBFouls;
 
     private ScoreViewModel mViewModel;
 
@@ -22,18 +24,9 @@ public class MainActivity extends LifecycleActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        teamAScoreTextView = (TextView) findViewById(R.id.team_a_score);
-        teamBScoreTextView = (TextView) findViewById(R.id.team_b_score);
-        goalHistoryTextView = (TextView) findViewById(R.id.goal_history);
-        teamAFouls = (TextView) findViewById(R.id.team_a_foul);
-        teamBFouls = (TextView) findViewById(R.id.team_b_foul);
 
         mViewModel = ViewModelProviders.of(this).get(ScoreViewModel.class);
-
-        displayFoulsForTeamA(mViewModel.getFoulsTeamA());
-        displayFoulsForTeamB(mViewModel.getFoulsTeamB());
-        displayForTeamA(mViewModel.getScoreTeamA());
-        displayForTeamB(mViewModel.getScoreTeamB());
+        displayAll();
 
     }
 
@@ -100,11 +93,15 @@ public class MainActivity extends LifecycleActivity {
 
     public void resetScore(View v) {
         mViewModel.resetAll();
+        resetGoalHistory();
+        displayAll();
+    }
+
+    private void displayAll() {
         displayFoulsForTeamA(mViewModel.getFoulsTeamA());
         displayFoulsForTeamB(mViewModel.getFoulsTeamB());
         displayForTeamA(mViewModel.getScoreTeamA());
         displayForTeamB(mViewModel.getScoreTeamB());
-        resetGoalHistory();
     }
 
 }
